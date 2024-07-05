@@ -1,7 +1,9 @@
 package jose.edenilson.proyectoformativo
 
 import Modelo.ClaseConexion
+import Modelo.tbDetallesPacientes
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
@@ -9,9 +11,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class AgregarPaciente : AppCompatActivity() {
@@ -34,6 +38,36 @@ class AgregarPaciente : AppCompatActivity() {
         val btnAgregar = findViewById<Button>(R.id.btnAgregar)
 
 
+        fun obtenerPacientes():List<tbDetallesPacientes>{
+
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbDetallesPacientes")!!
+
+            val listadoPacientes = mutableListOf<tbDetallesPacientes>()
+
+            while (resultSet.next()){
+                val id_DetallePaciente = resultSet.getInt("id_DetallePaciente")
+                val nombre_Paciente = resultSet.getString("nombre_Paciente")
+                val apellido_Paciente = resultSet.getString("apellido_Paciente")
+                val edad = resultSet.getInt("edad")
+                val unPacienteCompleto = tbDetallesPacientes(id_DetallePaciente,nombre_Paciente,apellido_Paciente,edad)
+                listadoPacientes.add(unPacienteCompleto)
+
+            }
+            return listadoPacientes
+        }
+
+        GlobalScope.launch(Dispatchers.IO){
+            val MilistadoDePacientes = obtenerPacientes()
+            val nombrePacientes = MilistadoDePacientes.map { it.nombre_Paciente }
+
+            withContext(Dispatchers.Main){
+                val miAdaptador = ArrayAdapter(this@AgregarPaciente,android.R.layout.simple_spinner_item,nombrePacientes)
+                spPaciente.adapter = miAdaptador
+            }
+        }
+
 
         btnAgregar.setOnClickListener {
              GlobalScope.launch(Dispatchers.IO) {
@@ -48,4 +82,6 @@ class AgregarPaciente : AppCompatActivity() {
              }
         }
     }
+
+
 }

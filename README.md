@@ -1,4 +1,4 @@
-'''Oracle
+'''SQL
 
 create table tbDetallesPacientes(
 id_DetallePaciente number primary key,

@@ -1,7 +1,9 @@
 package jose.edenilson.proyectoformativo
 
 import Modelo.ClaseConexion
+import Modelo.tbCamas
 import Modelo.tbDetallesPacientes
+import Modelo.tbHabitaciones
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -58,29 +60,92 @@ class AgregarPaciente : AppCompatActivity() {
             return listadoPacientes
         }
 
-        GlobalScope.launch(Dispatchers.IO){
-            val MilistadoDePacientes = obtenerPacientes()
-            val nombrePacientes = MilistadoDePacientes.map { it.nombre_Paciente }
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaPacientes = obtenerPacientes()
+            val nombre_Paciente = verListaPacientes.map { it.nombre_Paciente .plus(" ").plus(it.apellido_Paciente)  }
 
-            withContext(Dispatchers.Main){
-                val miAdaptador = ArrayAdapter(this@AgregarPaciente,android.R.layout.simple_spinner_item,nombrePacientes)
-                spPaciente.adapter = miAdaptador
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@AgregarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    nombre_Paciente
+                )
+                spPaciente.adapter = Adaptador
             }
         }
 
 
-        btnAgregar.setOnClickListener {
-             GlobalScope.launch(Dispatchers.IO) {
-                 val Claseconexion = ClaseConexion().cadenaConexion()
 
-                 val addPacientes =
-                     Claseconexion?.prepareStatement("insert into tbPacientes(id_Paciente,id_DetallePaciente,id_Enfermedad,id_Medicamento,id_Camas,id_Habitacion,HoraMedicamento) values(?,?,?,?,?,?,?)")!!
-                  addPacientes.setString(1, UUID.randomUUID().toString())
-                  addPacientes.setString(2, spPaciente.selectedItem.toString())
+        fun obtenerCamas():List<tbCamas>{
 
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbCamas")!!
 
-             }
+            val listadoCamas = mutableListOf<tbCamas>()
+
+            while (resultSet.next()){
+                val id_Camas = resultSet.getInt("id_Camas")
+                val numero_Camas = resultSet.getInt("numero_Camas")
+                val unaCamaCompleto = tbCamas(id_Camas,numero_Camas)
+                listadoCamas.add(unaCamaCompleto)
+
+            }
+            return listadoCamas
         }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaCamas = obtenerCamas()
+            val numero_Camas = verListaCamas.map { it.numero_Camas  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@AgregarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Camas
+                )
+                spCama.adapter = Adaptador
+            }
+        }
+
+        fun obtenerHabitaciones():List<tbHabitaciones>{
+
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbHabitaciones")!!
+
+            val listadoHabitaciones = mutableListOf<tbHabitaciones>()
+
+            while (resultSet.next()){
+                val id_Habitacion = resultSet.getInt("id_Habitacion")
+                val numero_Habitacion = resultSet.getInt("numero_Habitacion")
+                val unaHabitacionCompleta = tbHabitaciones(id_Habitacion, numero_Habitacion)
+                listadoHabitaciones.add(unaHabitacionCompleta)
+            }
+            return listadoHabitaciones
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaHabitaciones = obtenerHabitaciones()
+            val numero_Habitaciones = verListaHabitaciones.map { it.numero_Habitacion  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@AgregarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Habitaciones
+                )
+                spHabitacion.adapter = Adaptador
+            }
+        }
+
+
+
+
+
+
+
+
     }
 
 

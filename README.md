@@ -1,4 +1,4 @@
-'''SQL
+```SQL
 
 create table tbDetallesPacientes(
 id_DetallePaciente number primary key,
@@ -65,4 +65,4 @@ insert into tbMedicamentos values(1,'paracetamol')
 insert into tbEnfermedades values(1,'gripe')
 
 
-'''
+```

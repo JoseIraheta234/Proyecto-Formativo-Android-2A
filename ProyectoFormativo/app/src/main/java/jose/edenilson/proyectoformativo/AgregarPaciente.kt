@@ -3,7 +3,9 @@ package jose.edenilson.proyectoformativo
 import Modelo.ClaseConexion
 import Modelo.tbCamas
 import Modelo.tbDetallesPacientes
+import Modelo.tbEnfermedades
 import Modelo.tbHabitaciones
+import Modelo.tbMedicamentos
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -140,7 +142,71 @@ class AgregarPaciente : AppCompatActivity() {
         }
 
 
+        fun obtenerMedicamentos():List<tbMedicamentos>{
 
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbMedicamentos")!!
+
+            val listadoMedicamentos = mutableListOf<tbMedicamentos>()
+
+            while (resultSet.next()){
+                val id_Medicamento = resultSet.getInt("id_Medicamento")
+                val nombre_Medicamento = resultSet.getString("nombre_Medicamento")
+                val unMedicamentoCompleto = tbMedicamentos(id_Medicamento,nombre_Medicamento)
+                listadoMedicamentos.add(unMedicamentoCompleto)
+
+            }
+            return listadoMedicamentos
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaMedicamentos = obtenerMedicamentos()
+            val numero_Medicamentos = verListaMedicamentos.map { it.nombre_Medicamento  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@AgregarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Medicamentos
+                )
+                spMedicamento.adapter = Adaptador
+            }
+        }
+
+
+
+        fun obtenerEnfermedades():List<tbEnfermedades>{
+
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbEnfermedades")!!
+
+            val listadoEnfermedades = mutableListOf<tbEnfermedades>()
+
+            while (resultSet.next()){
+                val id_Enfermedad = resultSet.getInt("id_Enfermedad")
+                val nombre_Enfermedad = resultSet.getString("nombre_Enfermedad")
+                val unaEnfermedadCompleta = tbEnfermedades(id_Enfermedad,nombre_Enfermedad)
+                listadoEnfermedades.add(unaEnfermedadCompleta)
+
+            }
+            return listadoEnfermedades
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaEnfermedades = obtenerEnfermedades()
+            val numero_Enfermedades = verListaEnfermedades.map { it.nombre_Enfermedad  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@AgregarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Enfermedades
+                )
+                spEnfermedad.adapter = Adaptador
+            }
+        }
 
 
 

@@ -20,10 +20,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         val btnParaRegistrar = findViewById<Button>(R.id.btnParaRegistrar)
+        val btnVerPacientes = findViewById<Button>(R.id.btnVerPacientes)
 
         btnParaRegistrar.setOnClickListener {
             val intent = android.content.Intent(this, AgregarPaciente::class.java)
             startActivity(intent)
         }
+
+        btnVerPacientes.setOnClickListener {
+            val intent = android.content.Intent(this, ListaDePacientes::class.java)
+            startActivity(intent)
+        }
+
     }
 }

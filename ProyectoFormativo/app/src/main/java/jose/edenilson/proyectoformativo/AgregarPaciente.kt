@@ -6,10 +6,12 @@ import Modelo.tbDetallesPacientes
 import Modelo.tbEnfermedades
 import Modelo.tbHabitaciones
 import Modelo.tbMedicamentos
+import RecyclerViewHelper.Adaptador
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -40,6 +42,7 @@ class AgregarPaciente : AppCompatActivity() {
         val spHabitacion = findViewById<Spinner>(R.id.spHabitacion)
         val txtHora = findViewById<EditText>(R.id.txtHora)
         val btnAgregar = findViewById<Button>(R.id.btnAgregar)
+        val imgRegresarA = findViewById<ImageView>(R.id.imgRegresarA)
 
 
         fun obtenerPacientes():List<tbDetallesPacientes>{
@@ -206,6 +209,34 @@ class AgregarPaciente : AppCompatActivity() {
                 )
                 spEnfermedad.adapter = Adaptador
             }
+        }
+
+        btnAgregar.setOnClickListener {
+            GlobalScope.launch(Dispatchers.IO) {
+
+                val Pacientes = obtenerPacientes()
+                val Habitaciones = obtenerHabitaciones()
+                val Medicamentos = obtenerMedicamentos()
+                val Enfermedades = obtenerEnfermedades()
+                val Camas = obtenerCamas()
+
+                val claseConexion = ClaseConexion().cadenaConexion()
+
+                val add0Paciente =
+                    claseConexion?.prepareStatement("insert into tbPacientes(id_DetallePaciente,id_Habitacion,id_Medicamento,id_Enfermedad,id_Camas,HoraMedicamento)values(?,?,?,?,?,?)")!!
+                add0Paciente.setInt(1, Pacientes[spPaciente.selectedItemPosition].id_DetallePaciente)
+                add0Paciente.setInt(2, Habitaciones[spHabitacion.selectedItemPosition].id_Habitacion)
+                add0Paciente.setInt(3, Medicamentos[spMedicamento.selectedItemPosition].id_Medicamento)
+                add0Paciente.setInt(4, Enfermedades[spEnfermedad.selectedItemPosition].id_Enfermedad)
+                add0Paciente.setInt(5, Camas[spCama.selectedItemPosition].id_Camas)
+                add0Paciente.setString(6, txtHora.text.toString())
+                add0Paciente.executeQuery()
+            }
+        }
+
+        imgRegresarA.setOnClickListener {
+            val intent = android.content.Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
 
 

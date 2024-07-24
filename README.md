@@ -1,45 +1,44 @@
 ```SQL
 
 create table tbDetallesPacientes(
-id_DetallePaciente number primary key,
+id_DetallePaciente int generated always as identity primary key,
 nombre_Paciente varchar2(40) not null,
 apellido_Paciente varchar2(40)not null,
 edad number not null
 );
 
+
 create table tbCamas(
-id_Camas number primary key,
+id_Camas int generated always as identity primary key,
 numero_Camas number not null
 );
 
 
 create table tbHabitaciones (
-id_Habitacion number primary key,
+id_Habitacion int generated always as identity primary key,
 numero_Habitacion number not null
 );
 
 
 create table tbMedicamentos(
-id_Medicamento number primary key,
+id_Medicamento int generated always as identity primary key,
 nombre_Medicamento varchar2(70) Not null
-
 );
 
 
 create table tbEnfermedades(
-id_Enfermedad number primary key,
+id_Enfermedad int generated always as identity primary key,
 nombre_Enfermedad varchar2(60) not null
 );
 
 
-
 create table tbPacientes(
-id_Paciente number primary key,
-id_DetallePaciente number not null,
-id_Habitacion number not null,
-id_Medicamento number not null,
-id_Enfermedad number not null,
-id_Camas number not null,
+id_Paciente int generated always as identity primary key,
+id_DetallePaciente int not null,
+id_Habitacion int not null,
+id_Medicamento int not null,
+id_Enfermedad int not null,
+id_Camas int not null,
 HoraMedicamento varchar2(100) not null,
 
 constraint fk_Id_Detalle_Paciente foreign key (id_DetallePaciente) references tbDetallesPacientes(id_DetallePaciente),
@@ -54,15 +53,15 @@ constraint fk_id_Camas foreign key (id_Camas) references tbCamas(id_Camas)
 );
 
 
-insert into tbDetallesPacientes values(1,'Paco','Martinez',20)
+insert into tbDetallesPacientes(nombre_Paciente,apellido_Paciente,edad)values('Paco','Martinez',20);
 
-insert into tbCamas values(1,1)
+insert into tbCamas(numero_Camas)values(1);
 
-insert into tbHabitaciones values(1,1)
+insert into tbHabitaciones(numero_Habitacion) values(1);
 
-insert into tbMedicamentos values(1,'paracetamol')
+insert into tbMedicamentos(nombre_Medicamento) values('paracetamol');
 
-insert into tbEnfermedades values(1,'gripe')
+insert into tbEnfermedades(nombre_Enfermedad) values('gripe');
 
 
 ```

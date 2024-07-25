@@ -1,8 +1,11 @@
 package jose.edenilson.proyectoformativo
 
 import Modelo.ClaseConexion
+import Modelo.tbCamas
 import Modelo.tbDetallesPacientes
 import Modelo.tbEnfermedades
+import Modelo.tbHabitaciones
+import Modelo.tbMedicamentos
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -31,25 +34,28 @@ class ActualizarPaciente : AppCompatActivity() {
         }
 
 
-        val imgEditarNombre = findViewById<ImageView>(R.id.imgEditarNombre)
         val imgEditarHabitaciones = findViewById<ImageView>(R.id.imgEditarHabitaciones)
         val imgEditarMedicamentos = findViewById<ImageView>(R.id.imgEditarMedicamentos)
         val imgEditarEnfermedad = findViewById<ImageView>(R.id.imgEditarEnfermedad)
         val imgEditarCamas = findViewById<ImageView>(R.id.imgEditarCamas)
         val imgEditarHora = findViewById<ImageView>(R.id.imgEditarHora)
 
-        val txtNombreDetalles = findViewById<EditText>(R.id.txtEditarNombre)
-        val txtHabitaciones = findViewById<EditText>(R.id.txtEditarHabitaciones)
-        val txtMedicamentos = findViewById<EditText>(R.id.txtEditarMedicamentos)
-        val txtEnfermedad = findViewById<EditText>(R.id.txtEditarEnfermedad)
-        val txtCamas = findViewById<EditText>(R.id.txtEditarCamas)
+        val txtNombreDetalles = findViewById<TextView>(R.id.txtNombre)
+        val spHabitaciones = findViewById<Spinner>(R.id.spHabitaciones)
+        val spMedicamentos = findViewById<Spinner>(R.id.spMedicamentos)
+        val spCamas = findViewById<Spinner>(R.id.spCamas)
         val txtHora = findViewById<EditText>(R.id.txtEditarHora)
 
         val btnActualizar = findViewById<TextView>(R.id.btnActualizar)
         val spEnfermedadD = findViewById<Spinner>(R.id.spEnfermedadD)
 
+        val id_Paciente = intent.getIntExtra("id_Paciente", 0)
 
 
+        val id_DetallePaciente = intent.getStringExtra("id_DetallePaciente")
+        txtNombreDetalles.text = id_DetallePaciente
+
+       
 
         fun obtenerEnfermedadesD():List<tbEnfermedades>{
 
@@ -90,8 +96,123 @@ class ActualizarPaciente : AppCompatActivity() {
         }
 
 
+        fun obtenerCamas():List<tbCamas>{
 
-        val id_Paciente = intent.getIntExtra("id_Paciente", 0)
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbCamas")!!
+
+            val listadoCamas = mutableListOf<tbCamas>()
+
+            while (resultSet.next()){
+                val id_Camas = resultSet.getInt("id_Camas")
+                val numero_Camas = resultSet.getInt("numero_Camas")
+                val unaCamaCompleto = tbCamas(id_Camas,numero_Camas)
+                listadoCamas.add(unaCamaCompleto)
+
+            }
+            return listadoCamas
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaCamas = obtenerCamas()
+            val numero_Camas = verListaCamas.map { it.numero_Camas  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@ActualizarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Camas
+                )
+                spCamas.adapter = Adaptador
+            }
+        }
+
+       spCamas.isEnabled = false
+        imgEditarCamas.setOnClickListener {
+            spCamas.isEnabled = true
+        }
+
+
+
+
+        fun obtenerHabitaciones():List<tbHabitaciones>{
+
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbHabitaciones")!!
+
+            val listadoHabitaciones = mutableListOf<tbHabitaciones>()
+
+            while (resultSet.next()){
+                val id_Habitacion = resultSet.getInt("id_Habitacion")
+                val numero_Habitacion = resultSet.getInt("numero_Habitacion")
+                val unaHabitacionCompleta = tbHabitaciones(id_Habitacion, numero_Habitacion)
+                listadoHabitaciones.add(unaHabitacionCompleta)
+            }
+            return listadoHabitaciones
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaHabitaciones = obtenerHabitaciones()
+            val numero_Habitaciones = verListaHabitaciones.map { it.numero_Habitacion  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@ActualizarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Habitaciones
+                )
+                spHabitaciones.adapter = Adaptador
+            }
+        }
+
+        spHabitaciones.isEnabled = false
+        imgEditarHabitaciones.setOnClickListener {
+            spHabitaciones.isEnabled = true
+        }
+
+
+        fun obtenerMedicamentos():List<tbMedicamentos>{
+
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbMedicamentos")!!
+
+            val listadoMedicamentos = mutableListOf<tbMedicamentos>()
+
+            while (resultSet.next()){
+                val id_Medicamento = resultSet.getInt("id_Medicamento")
+                val nombre_Medicamento = resultSet.getString("nombre_Medicamento")
+                val unMedicamentoCompleto = tbMedicamentos(id_Medicamento,nombre_Medicamento)
+                listadoMedicamentos.add(unMedicamentoCompleto)
+
+            }
+            return listadoMedicamentos
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaMedicamentos = obtenerMedicamentos()
+            val numero_Medicamentos = verListaMedicamentos.map { it.nombre_Medicamento  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@ActualizarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Medicamentos
+                )
+                spMedicamentos.adapter = Adaptador
+            }
+        }
+
+        spMedicamentos.isEnabled = false
+        imgEditarMedicamentos.setOnClickListener {
+            spMedicamentos.isEnabled = true
+        }
+
+
+
+
 
 
 
@@ -107,6 +228,42 @@ class ActualizarPaciente : AppCompatActivity() {
                 val commit = objConexion?.prepareStatement("commit")!!
                 commit.executeUpdate()
             }
+
+            GlobalScope.launch(Dispatchers.IO) {
+                val Camas = obtenerCamas()
+                val objConexion = ClaseConexion().cadenaConexion()
+                val updateCama =
+                    objConexion?.prepareStatement("update tbPacientes set id_Camas = ? where id_Paciente = ?")!!
+                updateCama.setInt(1,Camas[spCamas.selectedItemPosition].id_Camas)
+                updateCama.setInt(2, id_Paciente)
+                updateCama.executeUpdate()
+                val commit = objConexion?.prepareStatement("commit")!!
+                commit.executeUpdate()
+            }
+
+            GlobalScope.launch(Dispatchers.IO) {
+                val Habitaciones = obtenerHabitaciones()
+                val objConexion = ClaseConexion().cadenaConexion()
+                val updateCama =
+                    objConexion?.prepareStatement("update tbPacientes set id_Habitacion = ? where id_Paciente = ?")!!
+                updateCama.setInt(1,Habitaciones[spCamas.selectedItemPosition].id_Habitacion)
+                updateCama.setInt(2, id_Paciente)
+                updateCama.executeUpdate()
+                val commit = objConexion?.prepareStatement("commit")!!
+                commit.executeUpdate()
+            }
+
+            GlobalScope.launch(Dispatchers.IO) {
+                val Medicamentos = obtenerMedicamentos()
+                val objConexion = ClaseConexion().cadenaConexion()
+                val updateCama =
+                    objConexion?.prepareStatement("update tbPacientes set id_Medicamento = ? where id_Paciente = ?")!!
+                updateCama.setInt(1,Medicamentos[spCamas.selectedItemPosition].id_Medicamento)
+                updateCama.setInt(2, id_Paciente)
+                updateCama.executeUpdate()
+                val commit = objConexion?.prepareStatement("commit")!!
+                commit.executeUpdate()
+            }
         }
 
 
@@ -119,49 +276,6 @@ class ActualizarPaciente : AppCompatActivity() {
 
 
 
-        val id_DetallePaciente = intent.getStringExtra("id_DetallePaciente")
-        val id_Habitacion = intent.getIntExtra("id_Habitacion", 0)
-        val id_Medicamento = intent.getStringExtra("id_Medicamento")
-        val id_Enfermedad = intent.getStringExtra("id_Enfermedad")
-        val id_Camas = intent.getIntExtra("id_Camas", 0)
-        val HoraMedicamento = intent.getStringExtra("HoraMedicamento")
-
-
-        txtNombreDetalles.setText(id_DetallePaciente)
-        txtNombreDetalles.isEnabled = false
-
-        imgEditarNombre.setOnClickListener {
-            txtNombreDetalles.isEnabled = true
-        }
-
-
-
-        txtMedicamentos.setText(id_Medicamento)
-        txtMedicamentos.isEnabled = false
-        imgEditarMedicamentos.setOnClickListener {
-            txtMedicamentos.isEnabled = true
-        }
-
-
-
-        txtHora.setText(HoraMedicamento)
-        txtHora.isEnabled = false
-        imgEditarHora.setOnClickListener {
-            txtHora.isEnabled = true
-        }
-
-        txtHabitaciones.setText(id_Habitacion.toString())
-        txtHabitaciones.isEnabled = false
-        imgEditarHabitaciones.setOnClickListener {
-            txtHabitaciones.isEnabled = true
-        }
-
-
-        txtCamas.setText(id_Camas.toString())
-        txtCamas.isEnabled = false
-        imgEditarCamas.setOnClickListener {
-            txtCamas.isEnabled = true
-        }
 
 
 

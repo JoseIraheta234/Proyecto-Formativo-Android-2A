@@ -64,4 +64,6 @@ insert into tbMedicamentos(nombre_Medicamento) values('paracetamol');
 insert into tbEnfermedades(nombre_Enfermedad) values('gripe');
 
 
+SELECT p.id_Paciente, pd.nombre_Paciente,pd.apellido_Paciente, h.numero_Habitacion, m.nombre_Medicamento, e.nombre_Enfermedad,c.numero_Camas, p.HoraMedicamento FROM tbPacientes p INNER JOIN tbDetallesPacientes pd ON p.id_DetallePaciente = pd.id_DetallePaciente INNER JOIN tbCamas c ON p.id_Camas = c.id_Camas INNER JOIN tbHabitaciones h ON p.id_Habitacion = h.id_Habitacion INNER JOIN tbMedicamentos m ON p.id_Medicamento = m.id_Medicamento INNER JOIN tbEnfermedades e ON p.id_Enfermedad = e.id_Enfermedad
+
 ```

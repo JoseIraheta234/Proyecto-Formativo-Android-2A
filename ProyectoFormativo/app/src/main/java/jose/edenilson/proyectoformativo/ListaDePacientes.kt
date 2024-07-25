@@ -39,12 +39,11 @@ class ListaDePacientes : AppCompatActivity() {
         fun obtenerPacientes(): List<tbPacientes> {
             val objConexion = ClaseConexion().cadenaConexion()
             val statement = objConexion?.createStatement()
-            val resultSet = statement?.executeQuery("Select * From tbPacientes")!!
+            val resultSet = statement?.executeQuery("SELECT p.id_Paciente, pd.nombre_Paciente, p.id_Habitacion, p.id_Medicamento, p.id_Enfermedad, p.id_Camas, p.HoraMedicamento FROM tbPacientes p INNER JOIN tbDetallesPacientes pd ON p.id_DetallePaciente = pd.id_DetallePaciente")!!
             val listadoPacientes = mutableListOf<tbPacientes>()
-
             while (resultSet.next()) {
                 val id_Paciente = resultSet.getInt("id_Paciente")
-                val id_DetallePaciente = resultSet.getInt("id_DetallePaciente")
+                val id_DetallePaciente = resultSet.getString("nombre_Paciente")
                 val id_Habitacion = resultSet.getInt("id_Habitacion")
                 val id_Medicamento = resultSet.getInt("id_Medicamento")
                 val id_Enfermedad = resultSet.getInt("id_Enfermedad")

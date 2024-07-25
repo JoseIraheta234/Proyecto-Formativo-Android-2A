@@ -114,6 +114,7 @@ class Adaptador(var Datos: List<tbPacientes>) : RecyclerView.Adapter<ViewHolder>
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val ActualizarPaciente = Intent(context, ActualizarPaciente::class.java)
+            ActualizarPaciente.putExtra("id_Paciente", item.id_Paciente)
             ActualizarPaciente.putExtra("id_DetallePaciente", item.id_DetallePaciente)
             ActualizarPaciente.putExtra("id_Habitacion", item.id_Habitacion)
             ActualizarPaciente.putExtra("id_Medicamento", item.id_Medicamento)

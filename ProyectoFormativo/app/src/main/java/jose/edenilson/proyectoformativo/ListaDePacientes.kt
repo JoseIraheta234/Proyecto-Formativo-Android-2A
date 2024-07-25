@@ -39,15 +39,15 @@ class ListaDePacientes : AppCompatActivity() {
         fun obtenerPacientes(): List<tbPacientes> {
             val objConexion = ClaseConexion().cadenaConexion()
             val statement = objConexion?.createStatement()
-            val resultSet = statement?.executeQuery("SELECT p.id_Paciente, pd.nombre_Paciente,h.numero_Habitacion, m.nombre_Medicamento, e.nombre_Enfermedad,c.numero_Camas, p.HoraMedicamento FROM tbPacientes p INNER JOIN tbDetallesPacientes pd ON p.id_DetallePaciente = pd.id_DetallePaciente INNER JOIN tbCamas c ON p.id_Camas = c.id_Camas INNER JOIN tbHabitaciones h ON p.id_Habitacion = h.id_Habitacion INNER JOIN tbMedicamentos m ON p.id_Medicamento = m.id_Medicamento INNER JOIN tbEnfermedades e ON p.id_Enfermedad = e.id_Enfermedad")!!
+            val resultSet = statement?.executeQuery("SELECT p.id_Paciente, pd.nombre_Paciente,p.id_Habitacion, m.nombre_Medicamento, e.nombre_Enfermedad,p.id_Camas, p.HoraMedicamento FROM tbPacientes p INNER JOIN tbDetallesPacientes pd ON p.id_DetallePaciente = pd.id_DetallePaciente INNER JOIN tbMedicamentos m ON p.id_Medicamento = m.id_Medicamento INNER JOIN tbEnfermedades e ON p.id_Enfermedad = e.id_Enfermedad")!!
             val listadoPacientes = mutableListOf<tbPacientes>()
             while (resultSet.next()) {
                 val id_Paciente = resultSet.getInt("id_Paciente")
                 val id_DetallePaciente = resultSet.getString("nombre_Paciente")
-                val id_Habitacion = resultSet.getInt("numero_Habitacion")
+                val id_Habitacion = resultSet.getInt("id_Habitacion")
                 val id_Medicamento = resultSet.getString("nombre_Medicamento")
                 val id_Enfermedad = resultSet.getString("nombre_Enfermedad")
-                val id_Camas = resultSet.getInt("numero_Camas")
+                val id_Camas = resultSet.getInt("id_Camas")
                 val HoraMedicamento = resultSet.getString("HoraMedicamento")
 
                 val valoresjuntos = tbPacientes(id_Paciente,id_DetallePaciente,id_Habitacion,id_Medicamento,id_Enfermedad,id_Camas,HoraMedicamento)

@@ -1,17 +1,23 @@
 package jose.edenilson.proyectoformativo
 
 import Modelo.ClaseConexion
+import Modelo.tbDetallesPacientes
+import Modelo.tbEnfermedades
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ActualizarPaciente : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,8 +46,75 @@ class ActualizarPaciente : AppCompatActivity() {
         val txtHora = findViewById<EditText>(R.id.txtEditarHora)
 
         val btnActualizar = findViewById<TextView>(R.id.btnActualizar)
+        val spEnfermedadD = findViewById<Spinner>(R.id.spEnfermedadD)
 
 
+
+
+        fun obtenerEnfermedadesD():List<tbEnfermedades>{
+
+            val objConexion = ClaseConexion().cadenaConexion()
+            val statement = objConexion?.createStatement()
+            val resultSet = statement?.executeQuery("Select * From tbEnfermedades")!!
+
+            val listadoEnfermedades = mutableListOf<tbEnfermedades>()
+
+            while (resultSet.next()){
+                val id_Enfermedad = resultSet.getInt("id_Enfermedad")
+                val nombre_Enfermedad = resultSet.getString("nombre_Enfermedad")
+                val unaEnfermedadCompleta = tbEnfermedades(id_Enfermedad,nombre_Enfermedad)
+                listadoEnfermedades.add(unaEnfermedadCompleta)
+
+            }
+            return listadoEnfermedades
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val verListaEnfermedades = obtenerEnfermedadesD()
+            val numero_Enfermedades = verListaEnfermedades.map { it.nombre_Enfermedad  }
+
+            withContext(Dispatchers.Main) {
+                val Adaptador = ArrayAdapter(
+                    this@ActualizarPaciente,
+                    android.R.layout.simple_spinner_dropdown_item,
+                    numero_Enfermedades
+                )
+                spEnfermedadD.adapter = Adaptador
+            }
+        }
+
+        spEnfermedadD.isEnabled = false
+
+        imgEditarEnfermedad.setOnClickListener {
+            spEnfermedadD.isEnabled = true
+        }
+
+
+
+        val id_Paciente = intent.getIntExtra("id_Paciente", 0)
+
+
+
+        btnActualizar.setOnClickListener{
+            GlobalScope.launch(Dispatchers.IO) {
+                val Enfermedades = obtenerEnfermedadesD()
+                val objConexion = ClaseConexion().cadenaConexion()
+                val updatePaciente =
+                    objConexion?.prepareStatement("update tbPacientes set id_Enfermedad = ? where id_Paciente = ?")!!
+                updatePaciente.setInt(1,Enfermedades[spEnfermedadD.selectedItemPosition].id_Enfermedad)
+                updatePaciente.setInt(2, id_Paciente)
+                updatePaciente.executeUpdate()
+                val commit = objConexion?.prepareStatement("commit")!!
+                commit.executeUpdate()
+            }
+        }
+
+
+
+
+
+
+        
 
 
 
@@ -52,10 +125,6 @@ class ActualizarPaciente : AppCompatActivity() {
         val id_Enfermedad = intent.getStringExtra("id_Enfermedad")
         val id_Camas = intent.getIntExtra("id_Camas", 0)
         val HoraMedicamento = intent.getStringExtra("HoraMedicamento")
-        val id_Paciente = intent.getIntExtra("id_Paciente", 0)
-
-
-
 
 
         txtNombreDetalles.setText(id_DetallePaciente)
@@ -71,12 +140,6 @@ class ActualizarPaciente : AppCompatActivity() {
         txtMedicamentos.isEnabled = false
         imgEditarMedicamentos.setOnClickListener {
             txtMedicamentos.isEnabled = true
-        }
-
-        txtEnfermedad.setText(id_Enfermedad)
-        txtEnfermedad.isEnabled = false
-        imgEditarEnfermedad.setOnClickListener {
-            txtEnfermedad.isEnabled = true
         }
 
 
@@ -102,26 +165,7 @@ class ActualizarPaciente : AppCompatActivity() {
 
 
 
-        btnActualizar.setOnClickListener{
-            GlobalScope.launch(Dispatchers.IO) {
-                val objConexion = ClaseConexion().cadenaConexion()
-                val updatePaciente =
-                    objConexion?.prepareStatement("update tbPacientes set id_DetallePaciente = ?,id_Habitacion = ?,id_Medicamento = ?,id_Enfermedad = ?,id_Camas = ?, HoraMedicamento = ?  where id_Paciente = ?")!!
-                updatePaciente.setString(1, txtNombreDetalles.text.toString())
-                updatePaciente.setInt(2, txtHabitaciones.text.toString().toInt())
-                updatePaciente.setString(3, txtMedicamentos.text.toString())
-                updatePaciente.setString(4, txtEnfermedad.text.toString())
-                updatePaciente.setInt(5, txtCamas.text.toString().toInt())
-                updatePaciente.setString(6, txtHora.text.toString())
-                updatePaciente.setInt(7, id_Paciente)
-                updatePaciente.executeUpdate()
 
-                val commit = objConexion?.prepareStatement("commit")!!
-                commit.executeUpdate()
-
-
-            }
-        }
 
 
 
